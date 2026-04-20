@@ -198,17 +198,71 @@ class _YemekSayfasiState extends State<YemekSayfasi> {
                   padding: const EdgeInsets.all(15),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadiusGeometry.circular(15),
+                    borderRadius: BorderRadius.circular(15),
                     border: Border.all(color: Colors.orange.shade50),
                   ),
                   child: SingleChildScrollView(
-                    child: Text(
-                      tarif,
-                      style: TextStyle(
-                        fontSize: 16,
-                        height: 1.6,
-                        color: Colors.grey[800],
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Row(
+                          children: [
+                            Icon(
+                              Icons.restaurant_menu,
+                              color: Color(0xFFFF5722),
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              'Tarif',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFFFF5722),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const Divider(height: 20, thickness: 1),
+                        ...tarif.split('.').where((s) => s.trim().isNotEmpty).map(
+                          (adim) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8.0,
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Turuncu onay ikonu
+                                  Container(
+                                    margin: const EdgeInsets.only(top: 4),
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFFFFE0B2),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.check,
+                                      size: 16,
+                                      color: Color(0xFFFF5722),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  // Adım metni
+                                  Expanded(
+                                    child: Text(
+                                      "${adim.trim()}.", // Noktayı geri ekledik
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        height: 1.5,
+                                        color: Colors.grey[800],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ],
                     ),
                   ),
                 ),
