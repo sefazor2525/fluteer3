@@ -1,7 +1,13 @@
 ﻿import 'dart:math';
-import 'tarif_verileri.dart';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'kartlar.dart';
+import 'koleksiyon.dart';
+import 'profil.dart';
+import 'tarif_verileri.dart';
+import 'topluluk.dart';
 
 void main() {
   runApp(const BugunNeYesek());
@@ -26,57 +32,80 @@ class AnaEkran extends StatefulWidget {
 class _AnaEkranState extends State<AnaEkran> {
   int _seciliSayfa = 0;
 
-  late List<Widget> _sayfalar;
-
-  @override
-  void initState() {
-    super.initState();
-    _sayfalar = [
-      const YemekSayfasi(),
-      const KoleksiyonSayfasi(),
-      const TopluluguSayfasi(),
-      const ProfilSayfasi(),
-    ];
-  }
+  final List<Widget> _sayfalar = [
+    const YemekSayfasi(), // Bu sayfaların başında 'const' varsa, sınıf tanımlarında da olmalı.
+    const KoleksiyonSayfasi(),
+    const TopluluguSayfasi(),
+    const ProfilSayfasi(),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFFBF7),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFFFFBF7),
-        elevation: 0,
-        centerTitle: true,
-        title: const Text(
-          'Lezzet Durağı',
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFFFF5722),
+    return Column(
+      children: <Widget>[
+        const Padding(
+          padding: EdgeInsets.only(top: 25, bottom: 15),
+          child: Text(
+            'Kararsız mısın',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: Colors.black54,
+              letterSpacing: 0.8,
+            ),
+            textAlign: TextAlign.center,
           ),
         ),
-      ),
-      body: _sayfalar[_seciliSayfa],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _seciliSayfa,
-        onTap: (index) {
-          setState(() {
-            _seciliSayfa = index;
-          });
-        },
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: const Color(0xFFFF5722),
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Ana Sayfa'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark),
-            label: 'Koleksiyon',
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: Row(
+            children: [
+              hizliSecimButonu(
+                '⏱️',
+                '15 Dk Altı -',
+                'Hemen Yap!',
+                Colors.green,
+              ),
+              const SizedBox(width: 12),
+              hizliSecimButonu(
+                '🔍',
+                'Tek Tencere -',
+                'Bulaşık Yok!',
+                Colors.orange,
+              ),
+              const SizedBox(width: 12),
+              hizliSecimButonu(
+                '🧑‍🍳',
+                'Kararı Bize Bırak',
+                'Canlı Akış',
+                Colors.red,
+              ),
+              const SizedBox(width: 12),
+              hizliSecimButonu('🥗', 'Diyet Dostu', 'Hafif Atlat', Colors.blue),
+            ],
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Topluluk'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
-        ],
-      ),
+        ),
+        const SizedBox(height: 25),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: Row(
+            children: [
+              kucukYatayKart(
+                'assets/corba_1.jpg',
+                'Pratik Tavuklu Makarna',
+                '150',
+              ),
+              const SizedBox(width: 12),
+              kucukYatayKart('assets/yemek_1.jpg', 'Sebzeli Dolma', '120'),
+              const SizedBox(width: 12),
+              kucukYatayKart('assets/tatli_1.jpg', 'Çikolatalı Brownie', '95'),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+      ],
     );
   }
 }
@@ -94,10 +123,9 @@ class _YemekSayfasiState extends State<YemekSayfasi> {
   int tatli = 1;
   int secilisayfa = 0;
 
-  // Favori ve Kategori
   Set<String> favoriler = {};
   late SharedPreferences prefs;
-  String kategoriBirimi = 'geleneksel'; // 'geleneksel' or 'viral'
+  String kategoriBirimi = 'geleneksel';
 
   @override
   void initState() {
@@ -152,19 +180,22 @@ class _YemekSayfasiState extends State<YemekSayfasi> {
 
   void corbaDegistir() {
     setState(() {
-      corba = Random().nextInt(corbaListesi.length) + 1;
+      int maxIndex = getCurrentCorbaList().length;
+      corba = Random().nextInt(maxIndex) + 1;
     });
   }
 
   void anaYemekDegistir() {
     setState(() {
-      anayemek = Random().nextInt(anaYemekListesi.length) + 1;
+      int maxIndex = getCurrentAnaYemekList().length;
+      anayemek = Random().nextInt(maxIndex) + 1;
     });
   }
 
   void tatliDegistir() {
     setState(() {
-      tatli = Random().nextInt(tatliListesi.length) + 1;
+      int maxIndex = getCurrentTatliList().length;
+      tatli = Random().nextInt(maxIndex) + 1;
     });
   }
 
@@ -229,7 +260,7 @@ class _YemekSayfasiState extends State<YemekSayfasi> {
                 ],
               ),
               const SizedBox(height: 15),
-              // Bilgi kartları
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -487,6 +518,7 @@ class _YemekSayfasiState extends State<YemekSayfasi> {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
+        hizliSecimButonu('⏱️', '15 Dk Altı', 'Hemen Yap!', Colors.green),
         Padding(
           padding: const EdgeInsets.only(top: 20.0, bottom: 10),
           child: Text(
@@ -604,48 +636,6 @@ class _YemekSayfasiState extends State<YemekSayfasi> {
         ),
         const SizedBox(height: 30),
       ],
-    );
-  }
-}
-
-class KoleksiyonSayfasi extends StatelessWidget {
-  const KoleksiyonSayfasi({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        'Koleksiyon',
-        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-}
-
-class TopluluguSayfasi extends StatelessWidget {
-  const TopluluguSayfasi({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        'Topluluk',
-        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-}
-
-class ProfilSayfasi extends StatelessWidget {
-  const ProfilSayfasi({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        'Profil',
-        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-      ),
     );
   }
 }
