@@ -18,7 +18,10 @@ class BugunNeYesek extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(debugShowCheckedModeBanner: false, home: AnaEkran());
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: const AnaEkran(),
+    );
   }
 }
 
@@ -31,81 +34,450 @@ class AnaEkran extends StatefulWidget {
 
 class _AnaEkranState extends State<AnaEkran> {
   int _seciliSayfa = 0;
+  Set<String> _favoriler = {};
+  late SharedPreferences _prefs;
 
   final List<Widget> _sayfalar = [
-    const YemekSayfasi(), // Bu sayfaların başında 'const' varsa, sınıf tanımlarında da olmalı.
+    const YemekSayfasi(),
     const KoleksiyonSayfasi(),
     const TopluluguSayfasi(),
     const ProfilSayfasi(),
   ];
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
+    _loadFavorites();
+  }
+
+  Future<void> _loadFavorites() async {
+    _prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _favoriler = Set<String>.from(_prefs.getStringList('favoriler') ?? []);
+    });
+  }
+
+  Future<void> _toggleFavori(String tarifAdi) async {
+    setState(() {
+      if (_favoriler.contains(tarifAdi)) {
+        _favoriler.remove(tarifAdi);
+      } else {
+        _favoriler.add(tarifAdi);
+      }
+    });
+    await _prefs.setStringList('favoriler', _favoriler.toList());
+  }
+
+  void _tarifPaneliniAc(String ad, Map<String, dynamic> tarifDetaylari) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+      ),
+      backgroundColor: const Color(0xFFFFFBF7),
+      builder: (context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.85,
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[400],
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
+              const SizedBox(height: 15),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      ad,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFFFF5722),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      _toggleFavori(ad);
+                      Navigator.pop(context);
+                    },
+                    child: Icon(
+                      _favoriler.contains(ad)
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      color: const Color(0xFFFF5722),
+                      size: 28,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 15),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _infoCard(
+                    '⏱️',
+                    tarifDetaylari['hazirlasuresi'] ?? 'N/A',
+                    'Hazırlık',
+                  ),
+                  _infoCard(
+                    '🔥',
+                    tarifDetaylari['pisirmesuresi'] ?? 'N/A',
+                    'Pişirme',
+                  ),
+                  _infoCard('⭐', tarifDetaylari['zorluk'] ?? 'N/A', 'Zorluk'),
+                  _infoCard(
+                    '👥',
+                    tarifDetaylari['kisisayisi'] ?? 'N/A',
+                    'Kişi',
+                  ),
+                ],
+              ),
+              const SizedBox(height: 15),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.shade50,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.local_fire_department,
+                              color: Color(0xFFFF5722),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Kalori: ${tarifDetaylari['kalori'] ?? 'N/A'}',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFFFF5722),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      const Row(
+                        children: [
+                          Icon(Icons.shopping_basket, color: Color(0xFFFF5722)),
+                          SizedBox(width: 8),
+                          Text(
+                            'Malzemeler',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFFFF5722),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Divider(height: 15, thickness: 1),
+                      ...(tarifDetaylari['malzemeler'] as List?)?.map(
+                            (malzeme) => Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 6.0,
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.only(top: 6),
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFFFFE0B2),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.check,
+                                      size: 14,
+                                      color: Color(0xFFFF5722),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      malzeme,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        height: 1.5,
+                                        color: Colors.grey[800],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ) ??
+                          [],
+                      const SizedBox(height: 20),
+                      const Row(
+                        children: [
+                          Icon(Icons.restaurant_menu, color: Color(0xFFFF5722)),
+                          SizedBox(width: 8),
+                          Text(
+                            'Tarif',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFFFF5722),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Divider(height: 15, thickness: 1),
+                      Text(
+                        tarifDetaylari['tarif'] ?? 'Tarif bulunamadı',
+                        style: TextStyle(
+                          fontSize: 14,
+                          height: 1.6,
+                          color: Colors.grey[800],
+                        ),
+                        textAlign: TextAlign.justify,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _infoCard(String icon, String value, String label) {
     return Column(
-      children: <Widget>[
-        const Padding(
-          padding: EdgeInsets.only(top: 25, bottom: 15),
-          child: Text(
-            'Kararsız mısın',
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-              color: Colors.black54,
-              letterSpacing: 0.8,
-            ),
-            textAlign: TextAlign.center,
+      children: [
+        Text(icon, style: const TextStyle(fontSize: 24)),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFFFF5722),
           ),
+          textAlign: TextAlign.center,
         ),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: Row(
-            children: [
-              hizliSecimButonu(
-                '⏱️',
-                '15 Dk Altı -',
-                'Hemen Yap!',
-                Colors.green,
-              ),
-              const SizedBox(width: 12),
-              hizliSecimButonu(
-                '🔍',
-                'Tek Tencere -',
-                'Bulaşık Yok!',
-                Colors.orange,
-              ),
-              const SizedBox(width: 12),
-              hizliSecimButonu(
-                '🧑‍🍳',
-                'Kararı Bize Bırak',
-                'Canlı Akış',
-                Colors.red,
-              ),
-              const SizedBox(width: 12),
-              hizliSecimButonu('🥗', 'Diyet Dostu', 'Hafif Atlat', Colors.blue),
-            ],
-          ),
-        ),
-        const SizedBox(height: 25),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: Row(
-            children: [
-              kucukYatayKart(
-                'assets/corba_1.jpg',
-                'Pratik Tavuklu Makarna',
-                '150',
-              ),
-              const SizedBox(width: 12),
-              kucukYatayKart('assets/yemek_1.jpg', 'Sebzeli Dolma', '120'),
-              const SizedBox(width: 12),
-              kucukYatayKart('assets/tatli_1.jpg', 'Çikolatalı Brownie', '95'),
-            ],
-          ),
-        ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 2),
+        Text(label, style: TextStyle(fontSize: 10, color: Colors.grey[600])),
       ],
+    );
+  }
+
+  Widget _yemekBolumu(
+    String resimyolu,
+    String yemekAdi,
+    Map<String, dynamic> tarifDetaylari,
+  ) {
+    return Container(
+      height: 200,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          const BoxShadow(
+            color: Color.fromRGBO(0, 0, 0, 0.05),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: () => _tarifPaneliniAc(yemekAdi, tarifDetaylari),
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
+                    child: Image.asset(
+                      resimyolu,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                    ),
+                  ),
+                  if (tarifDetaylari['viral'] == true)
+                    Positioned(
+                      top: 10,
+                      right: 10,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withValues(alpha: 0.9),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Row(
+                          children: [
+                            Text('🔥', style: TextStyle(fontSize: 16)),
+                            SizedBox(width: 4),
+                            Text(
+                              'Viral',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 12.0),
+            child: Text(
+              yemekAdi,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFFFF5722),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: _seciliSayfa == 0
+            ? Column(
+                children: <Widget>[
+                  const Padding(
+                    padding: EdgeInsets.only(top: 25, bottom: 15),
+                    child: Text(
+                      'Kararsız mısın',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black54,
+                        letterSpacing: 0.8,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Row(
+                      children: [
+                        hizliSecimButonu(
+                          '⏱️',
+                          '15 Dk Altı -',
+                          'Hemen Yap!',
+                          Colors.green,
+                        ),
+                        const SizedBox(width: 12),
+                        hizliSecimButonu(
+                          '🔍',
+                          'Tek Tencere -',
+                          'Bulaşık Yok!',
+                          Colors.orange,
+                        ),
+                        const SizedBox(width: 12),
+                        hizliSecimButonu(
+                          '🧑‍🍳',
+                          'Kararı Bize Bırak',
+                          'Canlı Akış',
+                          Colors.red,
+                        ),
+                        const SizedBox(width: 12),
+                        hizliSecimButonu(
+                          '🥗',
+                          'Diyet Dostu',
+                          'Hafif Atlat',
+                          Colors.blue,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 25),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 15, bottom: 10),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Bugünün Önerileri',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[700],
+                        ),
+                      ),
+                    ),
+                  ),
+                  _yemekBolumu(
+                    'assets/corba_1.jpg',
+                    corbaListesi[0]['ad']!,
+                    corbaListesi[0],
+                  ),
+                  _yemekBolumu(
+                    'assets/yemek_1.jpg',
+                    anaYemekListesi[0]['ad']!,
+                    anaYemekListesi[0],
+                  ),
+                  _yemekBolumu(
+                    'assets/tatli_1.jpg',
+                    tatliListesi[0]['ad']!,
+                    tatliListesi[0],
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              )
+            : _sayfalar[_seciliSayfa],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _seciliSayfa,
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
+        selectedItemColor: const Color(0xFFFF5722),
+        unselectedItemColor: Colors.grey,
+        onTap: (index) {
+          setState(() {
+            _seciliSayfa = index;
+          });
+        },
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Ana Sayfa'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bookmark),
+            label: 'Koleksiyon',
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Topluluk'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
+        ],
+      ),
     );
   }
 }

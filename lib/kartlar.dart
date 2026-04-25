@@ -12,10 +12,10 @@ Widget hizliSecimButonu(
     decoration: BoxDecoration(
       color: Colors.white,
       borderRadius: BorderRadius.circular(15),
-      border: Border.all(color: renk.withOpacity(0.5), width: 2),
+      border: Border.all(color: renk.withValues(alpha: 0.5), width: 2),
       boxShadow: [
         BoxShadow(
-          color: renk.withOpacity(0.1),
+          color: renk.withValues(alpha: 0.1),
           blurRadius: 8,
           offset: const Offset(0, 4),
         ),
@@ -72,7 +72,7 @@ Widget kucukYatayKart(String resimyolu, String baslik, String kisiSayisi) {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+              colors: [Colors.transparent, Colors.black.withValues(alpha: 0.7)],
             ),
           ),
         ),
@@ -82,7 +82,7 @@ Widget kucukYatayKart(String resimyolu, String baslik, String kisiSayisi) {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.red.withOpacity(0.8),
+              color: Colors.red.withValues(alpha: 0.8),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
