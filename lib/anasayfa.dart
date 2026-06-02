@@ -69,6 +69,73 @@ class _AnasayfaState extends State<Anasayfa> {
               ],
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                Text(
+                  "20 min",
+                  style: TextStyle(
+                    fontSize: 22,
+                    color: yaziRenk2,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    "Delivery",
+                    style: TextStyle(
+                      fontSize: 26,
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Text(
+                  "Meat lover , getready to meet your pizza ! ",
+                  style: TextStyle(fontSize: 22, color: yaziRenk2),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Text(
+                "\$ 5.98",
+                style: TextStyle(
+                  color: anaRenk,
+                  fontSize: 35,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(
+                width: 200,
+                height: 50,
+                child: TextButton(
+                  onPressed: () {},
+                  child: Text(
+                    "ADD TO CART",
+                    style: TextStyle(
+                      color: yaziRenk1,
+                      fontSize: 25,
+                      backgroundColor: anaRenk,
+                    ),
+                  ),
+                  style: TextButton.styleFrom(
+                    backgroundColor: anaRenk,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadiusGeometry.all(
+                        Radius.circular(10),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
