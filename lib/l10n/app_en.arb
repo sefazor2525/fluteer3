@@ -1,0 +1,28 @@
+{
+  "@@locale": "en",
+  "appTitle": "Design Study",
+  "appName": "Design Study",
+  "welcome": "Welcome",
+  "hello": "Hello, {name}!",
+  "@hello": {
+    "description": "A greeting message",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "John"
+      }
+    }
+  },
+  "home": "Home",
+  "settings": "Settings",
+  "language": "Language",
+  "english": "English",
+  "turkish": "Turkish",
+  "logout": "Logout",
+  "loading": "Loading...",
+  "error": "Error",
+  "success": "Success",
+  "cancel": "Cancel",
+  "save": "Save",
+  "delete": "Delete"
+}

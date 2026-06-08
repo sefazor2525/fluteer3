@@ -1,0 +1,28 @@
+{
+  "@@locale": "tr",
+  "appTitle": "Tasarım Çalışması",
+  "appName": "Tasarım Çalışması",
+  "welcome": "Hoş geldiniz",
+  "hello": "Merhaba, {name}!",
+  "@hello": {
+    "description": "Bir selamlama mesajı",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "John"
+      }
+    }
+  },
+  "home": "Anasayfa",
+  "settings": "Ayarlar",
+  "language": "Dil",
+  "english": "İngilizce",
+  "turkish": "Türkçe",
+  "logout": "Çıkış Yap",
+  "loading": "Yükleniyor...",
+  "error": "Hata",
+  "success": "Başarılı",
+  "cancel": "İptal",
+  "save": "Kaydet",
+  "delete": "Sil"
+}
